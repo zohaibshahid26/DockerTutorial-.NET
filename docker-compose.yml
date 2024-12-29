@@ -1,0 +1,37 @@
+﻿services:
+  DockerTutorialDb:
+    container_name: DockerTutorialDb
+    image: custom-sqlserver
+    build:
+        context: .
+        dockerfile: Dockerfile.sqlserver
+    ports:
+       - 1433:1433
+    environment:
+       - ACCEPT_EULA=Y
+       - MSSQL_SA_PASSWORD=Dotnet@123
+    networks:
+       - DockerTutorial
+    volumes:
+       - sqlserver_data:/var/opt/mssql
+       - C:\Program Files\Microsoft SQL Server\MSSQL16.SQLEXPRESS\MSSQL\Backup:/var/opt/mssql/backup
+
+  web:
+    container_name: web
+    ports:
+        - 5000:8080
+    image: ${DOCKER_REGISTRY-}web
+    build:
+        context: .
+        dockerfile: Dockerfile
+    depends_on:
+        - DockerTutorialDb
+    networks:
+        - DockerTutorial
+
+networks:
+    DockerTutorial:
+        driver: bridge
+
+volumes:
+    sqlserver_data:

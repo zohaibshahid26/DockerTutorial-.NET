@@ -1,0 +1,17 @@
+﻿FROM mcr.microsoft.com/mssql/server:2022-latest
+
+# Switch to root user to install mssql-tools
+USER root
+
+# Install required dependencies and mssql-tools
+RUN apt-get update && \
+    apt-get install -y curl gnupg && \
+    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | tee /etc/apt/sources.list.d/msprod.list && \
+    apt-get update && \
+    ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Switch back to the default user
+USER mssql
